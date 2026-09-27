@@ -1,0 +1,1 @@
+"""Flick image sequence player."""

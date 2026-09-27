@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+build/
+dist/
+downloads/
+test-downloads/
+*.py[cod]
+*.egg-info/
+*.spec
+!Flick.spec
