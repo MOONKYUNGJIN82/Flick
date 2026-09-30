@@ -7,6 +7,7 @@ on:
     paths:
       - 'Flick.mac.spec'
       - 'apps/flick/**'
+      - 'tests/**'
       - 'requirements-flick.txt'
       - 'assets/flick-icon-v2.png'
       - '.github/workflows/flick-macos-preview.yml'
