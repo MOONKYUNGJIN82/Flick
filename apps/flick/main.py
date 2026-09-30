@@ -379,7 +379,12 @@ class Window(QMainWindow):
             release, installer = job.result()
             if installer:
                 self.update_ready = installer
-                self.statusBar().showMessage(self.tr('Flick {version} 준비 완료 · 앱 종료 후 설치합니다.', version=release.version))
+                if sys.platform == 'darwin':
+                    if self.update_manual:
+                        subprocess.Popen(['open', '-R', str(installer)])
+                    self.statusBar().showMessage(self.tr('Flick {version} 다운로드 완료 · Finder에서 압축을 풀어 설치하세요.', version=release.version))
+                else:
+                    self.statusBar().showMessage(self.tr('Flick {version} 준비 완료 · 앱 종료 후 설치합니다.', version=release.version))
             elif self.update_manual:
                 self.statusBar().showMessage(self.tr('이미 최신 버전입니다.'))
         except Exception as exc:
@@ -869,7 +874,7 @@ class Window(QMainWindow):
         self.proxy_store.close()
         self.scanner.shutdown(wait=False, cancel_futures=True)
         self.updater.shutdown(wait=False, cancel_futures=True)
-        if self.update_ready and self.update_ready.is_file():
+        if self.update_ready and self.update_ready.is_file() and sys.platform == 'win32':
             try:
                 subprocess.Popen([str(self.update_ready), '/SILENT', '/SUPPRESSMSGBOXES',
                                   '/NORESTART', '/CLOSEAPPLICATIONS'],
@@ -895,7 +900,11 @@ def main():
     # Native decompression has its own pool; file jobs are bounded by Loader.
     OpenEXR.set_global_thread_count(min(8, max(2, os.cpu_count() or 2)))
     surface = QSurfaceFormat()
-    surface.setVersion(3, 3)
+    # macOS exposes Core Profile 3.2 and 4.1, but not 3.3.
+    if sys.platform == 'darwin':
+        surface.setVersion(4, 1)
+    else:
+        surface.setVersion(3, 3)
     surface.setProfile(QSurfaceFormat.OpenGLContextProfile.CoreProfile)
     surface.setSwapInterval(1)
     QSurfaceFormat.setDefaultFormat(surface)

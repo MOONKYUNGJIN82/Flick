@@ -6,12 +6,20 @@ from pathlib import Path
 import hashlib
 import json
 import os
+import platform
 import re
 import sys
 import urllib.request
 
 VERSION = '1.0.0'
-ASSET_NAME = 'Flick.Setup.exe'
+def asset_name():
+    if sys.platform == 'darwin':
+        arch = 'arm64' if platform.machine().lower() in ('arm64', 'aarch64') else 'x86_64'
+        return f'Flick-macOS-{arch}.zip'
+    return 'Flick.Setup.exe'
+
+
+ASSET_NAME = asset_name()
 def configured_repository():
     override = os.environ.get('FLICK_GITHUB_REPOSITORY')
     if override is not None:
@@ -66,8 +74,8 @@ def latest_release(repository=REPOSITORY, current=VERSION, opener=urllib.request
 
 def download_release(release: Release, directory: Path, opener=urllib.request.urlopen):
     directory.mkdir(parents=True, exist_ok=True)
-    target = directory / f'Flick-{release.version}.Setup.exe'
-    temporary = directory / f'Flick-{release.version}.Setup.part'
+    target = directory / f'Flick-{release.version}-{ASSET_NAME}'
+    temporary = directory / f'Flick-{release.version}-{ASSET_NAME}.part'
     if target.is_file() and target.stat().st_size == release.size:
         with target.open('rb') as existing:
             if hashlib.file_digest(existing, 'sha256').hexdigest() == release.sha256:
@@ -92,4 +100,6 @@ def download_release(release: Release, directory: Path, opener=urllib.request.ur
 
 
 def update_dir():
+    if sys.platform == 'darwin':
+        return Path.home() / 'Library' / 'Caches' / 'Flick' / 'updates'
     return Path(os.environ.get('LOCALAPPDATA', Path.home() / '.cache')) / 'Flick' / 'updates'
