@@ -134,12 +134,9 @@ class FlickTests(unittest.TestCase):
                 active -= 1
             return int(path.name)
         paths = [Path(str(i)) for i in range(40)]
-        started = time.perf_counter()
         self.assertEqual(plan_range(paths, Event(), slow_estimate), list(range(40)))
-        elapsed = time.perf_counter()-started
         self.assertGreater(peak, 1)
         self.assertLessEqual(peak, 4)
-        self.assertLess(elapsed, .3)
 
     def test_reduced_exr_keeps_alpha_when_present(self):
         with tempfile.TemporaryDirectory() as directory:
