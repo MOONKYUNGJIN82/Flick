@@ -1,6 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 """Unsigned/ad-hoc Mac App Store preflight build; distribution signing is separate."""
 from PyInstaller.utils.hooks import collect_dynamic_libs
+import os
 
 
 a = Analysis(
@@ -31,7 +32,7 @@ exe = EXE(
     upx=False,
     console=False,
     target_arch='arm64',
-    codesign_identity=None,
+    codesign_identity=os.environ.get('FLICK_APPLE_DISTRIBUTION_IDENTITY') or None,
     entitlements_file='packaging/flick-app-store.entitlements',
 )
 coll = COLLECT(

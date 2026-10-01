@@ -8,6 +8,7 @@ on:
       - 'Flick.mac.spec'
       - 'Flick.store.spec'
       - 'packaging/flick-app-store.*'
+      - 'packaging/build_store_pkg.sh'
       - 'apps/flick/**'
       - 'tests/**'
       - 'requirements-flick.txt'
@@ -31,7 +32,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-flick.txt pyinstaller
       - name: Test core
-        run: python -m unittest discover -s tests
+        run: |
+          python -m unittest discover -s tests
+          bash -n packaging/build_store_pkg.sh
       - name: Make macOS icon
         run: |
           mkdir -p build/Flick.iconset
