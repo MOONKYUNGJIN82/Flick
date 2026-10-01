@@ -9,6 +9,7 @@ on:
       - 'Flick.store.spec'
       - 'packaging/flick-app-store.*'
       - 'packaging/build_store_pkg.sh'
+      - 'packaging/smoke_macos.py'
       - 'apps/flick/**'
       - 'tests/**'
       - 'requirements-flick.txt'
@@ -52,6 +53,8 @@ jobs:
           plutil -lint dist/Flick.app/Contents/Info.plist
           file dist/Flick.app/Contents/MacOS/Flick
           codesign --verify --deep --strict dist/Flick.app
+      - name: Launch EXR in GPU viewer
+        run: python packaging/smoke_macos.py
       - name: Package preview
         run: ditto -c -k --keepParent dist/Flick.app dist/Flick-macOS-arm64-preview.zip
       - uses: actions/upload-artifact@v4
