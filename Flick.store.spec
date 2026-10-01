@@ -48,11 +48,12 @@ app = BUNDLE(
     name='Flick.app',
     icon='assets/flick.icns',
     bundle_identifier='media.kallos.flick',
-    version='1.0.0',
+    version='1.0',
     info_plist={
         'NSPrincipalClass': 'NSApplication',
         'NSHighResolutionCapable': True,
         'LSMinimumSystemVersion': '12.0',
         'CFBundleVersion': '1',
+        'LSApplicationCategoryType': 'public.app-category.video',
     },
 )
