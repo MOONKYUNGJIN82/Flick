@@ -10,12 +10,24 @@ import numpy as np
 import OpenEXR
 from PIL import Image
 
-from apps.flick.core import Frame, FrameCache, Loader, Sequence, decode, discover, frame_bytes, crypto_pixels, crypto_preview_color, CryptoRankCache, inspect_exr, pick_crypto, plan_range
+from apps.flick.core import Frame, FrameCache, Loader, Sequence, decode, discover, list_sequences, frame_bytes, crypto_pixels, crypto_preview_color, CryptoRankCache, inspect_exr, pick_crypto, plan_range
 from apps.flick.color import load_config, automatic_input, make_descriptors
 from apps.flick.proxy import ProxyStore
 
 
 class FlickTests(unittest.TestCase):
+    def test_folder_picker_groups_sequences_and_ignores_other_files(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in ('shot.1001.exr', 'shot.1002.exr', 'preview.png', 'notes.txt'):
+                (root / name).touch()
+            (root / 'subfolder').mkdir()
+            choices = list_sequences(root)
+            self.assertEqual(len(choices), 2)
+            self.assertEqual({path.name for _, path in choices}, {'shot.1001.exr', 'preview.png'})
+            self.assertEqual([path.name for path in discover(root / 'shot.1001.exr').paths],
+                             ['shot.1001.exr', 'shot.1002.exr'])
+
     def test_crypto_rank_cache_is_bounded(self):
         cache = CryptoRankCache(limit=64)
         rank = tuple(np.zeros((2, 2), np.float32) for _ in range(4))

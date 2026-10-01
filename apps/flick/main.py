@@ -14,10 +14,10 @@ import OpenEXR
 from PySide6.QtCore import Qt, QTimer, Signal, QUrl
 from PySide6.QtGui import QAction, QColor, QPainter, QSurfaceFormat, QPen, QIcon, QDesktopServices
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QPushButton, QFileDialog, QSlider, QComboBox, QDoubleSpinBox, QSpinBox, QCheckBox,
+    QLabel, QPushButton, QFileDialog, QInputDialog, QSlider, QComboBox, QDoubleSpinBox, QSpinBox, QCheckBox,
     QProgressBar)
 
-from .core import Loader, discover, SUPPORTED, decode, frame_bytes, inspect_exr, pick_crypto, crypto_preview_color
+from .core import Loader, discover, list_sequences, SUPPORTED, decode, frame_bytes, inspect_exr, pick_crypto, crypto_preview_color
 from .proxy import ProxyStore
 from .viewer import Viewer
 from .color import load_config, automatic_input, make_descriptors
@@ -595,13 +595,25 @@ class Window(QMainWindow):
         self.statusBar().showMessage(self.tr('로딩 취소 · 재생하려면 구간을 다시 읽으세요.'))
 
     def choose(self):
-        folder = ''
         if is_app_store_build():
-            # A file grant does not cover adjacent sequence frames in App Sandbox.
+            # A folder grant covers adjacent frames; a single-file grant does not.
             folder = QFileDialog.getExistingDirectory(self, self.tr('시퀀스 폴더 선택'))
             if not folder:
                 return
-        path, _ = QFileDialog.getOpenFileName(self, self.tr('시퀀스의 이미지 한 장 선택'), folder,
+            choices = list_sequences(folder)
+            if not choices:
+                self.statusBar().showMessage(self.tr('선택한 폴더에 이미지 시퀀스가 없습니다.'))
+                return
+            if len(choices) == 1:
+                self.open_path(choices[0][1])
+                return
+            labels = [label for label, _ in choices]
+            selected, accepted = QInputDialog.getItem(
+                self, self.tr('시퀀스 선택'), self.tr('열 시퀀스를 선택하세요.'), labels, 0, False)
+            if accepted:
+                self.open_path(choices[labels.index(selected)][1])
+            return
+        path, _ = QFileDialog.getOpenFileName(self, self.tr('시퀀스의 이미지 한 장 선택'), '',
                                              'Images (*.exr *.jpg *.jpeg *.png *.tga)')
         if path:
             self.open_path(path)

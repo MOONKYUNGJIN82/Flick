@@ -52,6 +52,10 @@ EN = {
     'Ctrl+O  열기     Space  재생': 'Ctrl+O  Open     Space  Play',
     '이미지 한 장을 열면 시퀀스를 함께 불러옵니다': 'Open one image to load its sequence',
     '시퀀스의 이미지 한 장 선택': 'Choose an image in the sequence',
+    '시퀀스 폴더 선택': 'Choose the sequence folder',
+    '선택한 폴더에 이미지 시퀀스가 없습니다.': 'No image sequences were found in the selected folder.',
+    '시퀀스 선택': 'Choose a sequence',
+    '열 시퀀스를 선택하세요.': 'Choose a sequence to open.',
     'OCIO 설정 열기': 'Open OCIO config',
     '작업 구간 손잡이를 드래그해 읽기·재생 범위를 설정하세요.':
         'Drag the work-area handles to set the load and playback range.',

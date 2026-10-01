@@ -336,6 +336,31 @@ def discover(filename: str | Path) -> Sequence:
                     numbers[-1] - numbers[0] + 1 - len(set(numbers)))
 
 
+def list_sequences(folder: str | Path) -> list[tuple[str, Path]]:
+    """List selectable image sequences in a user-granted folder."""
+    groups: dict[tuple[str, int, str], list[Path]] = {}
+    for path in Path(folder).iterdir():
+        if not path.is_file() or path.suffix.lower() not in SUPPORTED:
+            continue
+        match = re.fullmatch(r'(.*?)(\d+)', path.stem)
+        if match:
+            prefix, digits = match.groups()
+            key = (prefix.casefold(), len(digits), path.suffix.lower())
+        else:
+            key = (path.stem.casefold(), 0, path.suffix.lower())
+        groups.setdefault(key, []).append(path)
+
+    choices = []
+    for paths in groups.values():
+        paths.sort(key=lambda path: path.name.casefold())
+        if len(paths) == 1:
+            label = paths[0].name
+        else:
+            label = f'{paths[0].name} – {paths[-1].name} ({len(paths)} frames)'
+        choices.append((label, paths[0]))
+    return sorted(choices, key=lambda choice: choice[0].casefold())
+
+
 @dataclass
 class Frame:
     pixels: np.ndarray

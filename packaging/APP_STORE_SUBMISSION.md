@@ -24,8 +24,9 @@ artifact named `Flick-macOS-arm64-store-preview`. It is for testing only. It is
 not a signed installer package and cannot be uploaded to App Store Connect.
 
 The Store build carries `flick-app-store.txt` and App Sandbox entitlements. Its
-update button is absent. A user selects a **folder** and then a frame, so the
-sandbox can read the adjacent files in the image sequence. Proxy files use the
+update button opens the App Store. A user selects a **folder**; Flick opens its
+only sequence automatically or shows a list if the folder contains several. The
+folder grant lets the sandbox read adjacent frames. Proxy files use the
 macOS cache location, which resolves inside the app container when sandboxed.
 
 Before submission, test the sandboxed app on a real Apple Silicon Mac with EXR,
