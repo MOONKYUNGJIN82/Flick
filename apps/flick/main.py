@@ -23,6 +23,7 @@ from .viewer import Viewer
 from .color import load_config, automatic_input, make_descriptors
 from .i18n import translate, translate_error
 from .update import REPOSITORY, latest_release, download_release, update_dir
+from .distribution import is_app_store_build
 
 
 class Timeline(QSlider):
@@ -136,7 +137,7 @@ class Window(QMainWindow):
         super().__init__()
         self.setWindowTitle('Flick 1.0.0')
         self.resize(1280, 820)
-        self.setAcceptDrops(True)
+        self.setAcceptDrops(not is_app_store_build())
         self.lang = 'ko'
         self.translatables = []
         self.loader = Loader()
@@ -192,7 +193,8 @@ class Window(QMainWindow):
         self.language.currentIndexChanged.connect(self.change_language)
         self.update_button = self.button('업데이트 확인')
         self.update_button.clicked.connect(lambda: self.check_update(manual=True))
-        top.addWidget(self.update_button)
+        if not is_app_store_build():
+            top.addWidget(self.update_button)
         open_button = self.button('시퀀스 열기')
         open_button.clicked.connect(self.choose)
         top.addWidget(open_button)
@@ -351,10 +353,13 @@ class Window(QMainWindow):
         self.update_timer = QTimer(self)
         self.update_timer.timeout.connect(self.poll_update)
         self.update_timer.start(500)
-        if REPOSITORY and getattr(sys, 'frozen', False) and not os.environ.get('FLICK_VERIFY_REPORT'):
+        if (not is_app_store_build() and REPOSITORY and getattr(sys, 'frozen', False)
+                and not os.environ.get('FLICK_VERIFY_REPORT')):
             QTimer.singleShot(1500, self.check_update)
 
     def check_update(self, manual=False):
+        if is_app_store_build():
+            return
         if self.update_job:
             return
         if not REPOSITORY:
@@ -586,7 +591,13 @@ class Window(QMainWindow):
         self.statusBar().showMessage(self.tr('로딩 취소 · 재생하려면 구간을 다시 읽으세요.'))
 
     def choose(self):
-        path, _ = QFileDialog.getOpenFileName(self, self.tr('시퀀스의 이미지 한 장 선택'), '',
+        folder = ''
+        if is_app_store_build():
+            # A file grant does not cover adjacent sequence frames in App Sandbox.
+            folder = QFileDialog.getExistingDirectory(self, self.tr('시퀀스 폴더 선택'))
+            if not folder:
+                return
+        path, _ = QFileDialog.getOpenFileName(self, self.tr('시퀀스의 이미지 한 장 선택'), folder,
                                              'Images (*.exr *.jpg *.jpeg *.png *.tga)')
         if path:
             self.open_path(path)
@@ -915,7 +926,7 @@ def main():
     style_app(app)
     window = Window()
     window.show()
-    if len(sys.argv) > 1:
+    if len(sys.argv) > 1 and not is_app_store_build():
         window.open_path(sys.argv[1])
     # Opt-in packaged-build verification; normal launches do not write reports.
     report = os.environ.get('FLICK_VERIFY_REPORT')

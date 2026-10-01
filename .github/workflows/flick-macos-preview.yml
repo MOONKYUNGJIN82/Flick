@@ -6,9 +6,12 @@ on:
     branches: [main]
     paths:
       - 'Flick.mac.spec'
+      - 'Flick.store.spec'
+      - 'packaging/flick-app-store.*'
       - 'apps/flick/**'
       - 'tests/**'
       - 'requirements-flick.txt'
+      - '.gitignore'
       - 'assets/flick-icon-v2.png'
       - '.github/workflows/flick-macos-preview.yml'
 
@@ -52,4 +55,19 @@ jobs:
         with:
           name: Flick-macOS-arm64-preview
           path: dist/Flick-macOS-arm64-preview.zip
+          if-no-files-found: error
+      - name: Build App Store sandbox preview
+        run: python -m PyInstaller --noconfirm Flick.store.spec
+      - name: Inspect App Store entitlements
+        run: |
+          test -f dist/Flick.app/Contents/Resources/flick-app-store.txt
+          codesign --verify --deep --strict dist/Flick.app
+          codesign -d --entitlements :- dist/Flick.app > build/store-entitlements.plist
+          test "$(plutil -extract com.apple.security.app-sandbox raw -o - build/store-entitlements.plist)" = true
+      - name: Package App Store sandbox preview
+        run: ditto -c -k --keepParent dist/Flick.app dist/Flick-macOS-arm64-store-preview.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Flick-macOS-arm64-store-preview
+          path: dist/Flick-macOS-arm64-store-preview.zip
           if-no-files-found: error

@@ -1,0 +1,1 @@
+Mac App Store build marker. Updates are delivered by the App Store.

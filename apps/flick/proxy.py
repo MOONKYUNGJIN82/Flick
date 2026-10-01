@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import sys
 from pathlib import Path
 import pickle
 from concurrent.futures import ThreadPoolExecutor
@@ -24,6 +25,9 @@ def default_cache_dir() -> Path:
     override = os.environ.get('FLICK_PROXY_CACHE_DIR')
     if override:
         return Path(override)
+    if sys.platform == 'darwin':
+        from PySide6.QtCore import QStandardPaths
+        return Path(QStandardPaths.writableLocation(QStandardPaths.StandardLocation.CacheLocation)) / 'proxy'
     return Path(os.environ.get('LOCALAPPDATA', Path.home() / '.cache')) / 'Flick' / 'proxy'
 
 

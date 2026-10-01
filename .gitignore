@@ -8,3 +8,5 @@ test-downloads/
 *.egg-info/
 *.spec
 !Flick.spec
+!Flick.mac.spec
+!Flick.store.spec
