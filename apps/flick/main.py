@@ -11,8 +11,8 @@ import json
 import subprocess
 
 import OpenEXR
-from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtGui import QAction, QColor, QPainter, QSurfaceFormat, QPen, QIcon
+from PySide6.QtCore import Qt, QTimer, Signal, QUrl
+from PySide6.QtGui import QAction, QColor, QPainter, QSurfaceFormat, QPen, QIcon, QDesktopServices
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QFileDialog, QSlider, QComboBox, QDoubleSpinBox, QSpinBox, QCheckBox,
     QProgressBar)
@@ -193,8 +193,7 @@ class Window(QMainWindow):
         self.language.currentIndexChanged.connect(self.change_language)
         self.update_button = self.button('업데이트 확인')
         self.update_button.clicked.connect(lambda: self.check_update(manual=True))
-        if not is_app_store_build():
-            top.addWidget(self.update_button)
+        top.addWidget(self.update_button)
         open_button = self.button('시퀀스 열기')
         open_button.clicked.connect(self.choose)
         top.addWidget(open_button)
@@ -359,6 +358,11 @@ class Window(QMainWindow):
 
     def check_update(self, manual=False):
         if is_app_store_build():
+            if manual:
+                if QDesktopServices.openUrl(QUrl('https://apps.apple.com/app/id6818051264')):
+                    self.statusBar().showMessage(self.tr('App Store에서 Flick 업데이트를 확인하세요.'))
+                else:
+                    self.statusBar().showMessage(self.tr('App Store를 열 수 없습니다.'))
             return
         if self.update_job:
             return

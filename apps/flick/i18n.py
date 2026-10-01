@@ -2,6 +2,8 @@
 
 EN = {
     '업데이트 확인': 'Check updates',
+    'App Store에서 Flick 업데이트를 확인하세요.': 'Check the App Store for Flick updates.',
+    'App Store를 열 수 없습니다.': 'Could not open the App Store.',
     '업데이트 확인 중…': 'Checking updates…',
     '업데이트 저장소가 설정되지 않았습니다.': 'Update repository is not configured.',
     'Flick {version} 준비 완료 · 앱 종료 후 설치합니다.': 'Flick {version} is ready · installs when you exit.',
