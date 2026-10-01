@@ -53,7 +53,7 @@ app = BUNDLE(
         'NSPrincipalClass': 'NSApplication',
         'NSHighResolutionCapable': True,
         'LSMinimumSystemVersion': '12.0',
-        'CFBundleVersion': '2',
+        'CFBundleVersion': '3',
         'LSApplicationCategoryType': 'public.app-category.video',
     },
 )

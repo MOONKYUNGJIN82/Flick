@@ -26,6 +26,10 @@ if [[ -n "${FLICK_STORE_PROFILE:-}" ]]; then
   cp "$FLICK_STORE_PROFILE" dist/Flick.app/Contents/embedded.provisionprofile
 fi
 
+# Downloaded provisioning profiles may carry quarantine metadata, which App Store
+# Connect rejects when it is embedded in the signed app.
+xattr -cr dist/Flick.app
+
 codesign --force --sign "$FLICK_APPLE_DISTRIBUTION_IDENTITY" \
   --entitlements packaging/flick-app-store.entitlements \
   --options runtime --timestamp dist/Flick.app
