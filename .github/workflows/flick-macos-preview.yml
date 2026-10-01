@@ -63,7 +63,7 @@ jobs:
           test -f dist/Flick.app/Contents/Resources/flick-app-store.txt
           codesign --force --sign - --entitlements packaging/flick-app-store.entitlements dist/Flick.app
           codesign --verify --deep --strict dist/Flick.app
-          codesign -d --entitlements - dist/Flick.app > build/store-entitlements.plist
+          codesign --display --entitlements - --xml dist/Flick.app | plutil -convert xml1 -o - - > build/store-entitlements.plist
           python -c "import plistlib; p=plistlib.load(open('build/store-entitlements.plist','rb')); assert p['com.apple.security.app-sandbox']; assert p['com.apple.security.files.user-selected.read-only']"
       - name: Package App Store sandbox preview
         run: ditto -c -k --keepParent dist/Flick.app dist/Flick-macOS-arm64-store-preview.zip
